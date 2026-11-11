@@ -1,0 +1,24 @@
+# Compilados
+*.class
+*.jar
+*.war
+hs_err_pid*
+
+# Maven / Gradle
+target/
+build/
+.gradle/
+out/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+nbproject/
+
+# Sistema
+.DS_Store
+Thumbs.db
