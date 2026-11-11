@@ -1,8 +1,8 @@
-# Alcance y requisitos — Sistema de Cafetería
+﻿# Alcance y requisitos — Sistema de Cafetería
 
 **Proyecto:** parcial de Patrones de Diseño (Ingeniería de Software)
 **Propuesta elegida:** 3 — Cafetería
-**Integrantes:** [NOMBRE 1], [NOMBRE 2], [NOMBRE 3]
+**Integrantes:** Samuel Chaparro, Cristian Daniel Blanco, Juan Diego Afanador
 **Fecha de entrega:** 23 de noviembre de 2026
 
 > **Nota de integridad académica:** este borrador fue redactado con apoyo de Claude (IA). El grupo lo revisó y adaptó y asume la responsabilidad de su contenido.
@@ -111,11 +111,10 @@ El alcance es abordable por tres estudiantes en pocas semanas: un único dominio
 
 ### 3.2 Decisiones por validar con la docente
 
-1. **Datos del grupo:** completar los nombres de los integrantes. Se dejaron como marcadores porque no se entregaron.
-2. **Persistencia:** ¿se acepta que los datos vivan solo en memoria, o se exige guardarlos en archivo o base de datos?
-3. **Interfaz gráfica:** ¿se prefiere Swing o JavaFX? Se sugiere Swing por venir incluido en el JDK.
-4. **Versión de Java y herramienta de construcción:** se sugiere Java 17 o superior con Maven o Gradle.
-5. **Número mínimo de patrones:** ¿se exige una cantidad concreta por categoría o basta con dos categorías distintas?
-6. **Número de áreas de variación:** se proponen seis, por encima del mínimo de tres. ¿Se prefiere reducirlas para acotar el trabajo?
-7. **Pruebas:** ¿se espera un nivel de cobertura mínimo y un marco concreto (se sugiere JUnit 5)?
-8. **Entregables:** ¿se pide un documento aparte con el UML y la justificación de patrones, además del código?
+1. **Persistencia:** ¿se acepta que los datos vivan solo en memoria, o se exige guardarlos en archivo o base de datos?
+2. **Interfaz gráfica:** ¿se prefiere Swing o JavaFX? Se sugiere Swing por venir incluido en el JDK.
+3. **Versión de Java y herramienta de construcción:** se sugiere Java 17 o superior con Maven o Gradle.
+4. **Número mínimo de patrones:** ¿se exige una cantidad concreta por categoría o basta con dos categorías distintas?
+5. **Número de áreas de variación:** se proponen seis, por encima del mínimo de tres. ¿Se prefiere reducirlas para acotar el trabajo?
+6. **Pruebas:** ¿se espera un nivel de cobertura mínimo y un marco concreto (se sugiere JUnit 5)?
+7. **Entregables:** ¿se pide un documento aparte con el UML y la justificación de patrones, además del código?
