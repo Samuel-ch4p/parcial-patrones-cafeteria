@@ -5,7 +5,6 @@
 **Integrantes:** Samuel Chaparro, Cristian Daniel Blanco, Juan Diego Afanador
 **Fecha de entrega:** 23 de noviembre de 2026
 
-> **Nota de integridad académica:** este borrador fue redactado con apoyo de Claude (IA). El grupo lo revisó y adaptó y asume la responsabilidad de su contenido.
 
 ---
 
