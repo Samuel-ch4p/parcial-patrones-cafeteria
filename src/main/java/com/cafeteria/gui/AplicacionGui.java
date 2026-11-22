@@ -1,7 +1,6 @@
 package com.cafeteria.gui;
 
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 /**
  * Arranque de la interfaz gráfica Swing.
@@ -15,11 +14,7 @@ public final class AplicacionGui {
 
     public static void iniciar() {
         SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                // Si falla, se usa el aspecto por defecto de Swing.
-            }
+            Estilo.instalar();
             new VentanaPrincipal().setVisible(true);
         });
     }
