@@ -4,7 +4,7 @@
 **Integrantes:** Samuel Chaparro, Cristian Daniel Blanco, Juan Diego Afanador
 **Entrega:** 23 de noviembre de 2026
 
-El sistema aplica ocho patrones de tres categorías: **creacional** (Factory Method), **estructural** (Decorator, Facade) y de **comportamiento** (Strategy en tres áreas, State y Observer). Cada patrón responde a un área de variación del [documento de alcance](01-alcance-y-requisitos.md) o a un requisito de arquitectura. Los diagramas están en [04-uml.md](04-uml.md) y la comparación con diseños ingenuos en [02-problemas-y-patrones.md](02-problemas-y-patrones.md).
+El sistema aplica ocho patrones de tres categorías: **creacional** (Factory Method), **estructural** (Decorator, Facade) y de **comportamiento** (Strategy en tres áreas, State y Observer). Cada patrón responde a un área de variación del [documento de alcance](01-alcance-y-requisitos.md) o a un requisito de arquitectura. Los diagramas están en [06-Uml.md](06-Uml.md) y la comparación con diseños ingenuos en [03-Problemas-y-patrones.md](03-Problemas-y-patrones.md).
 
 Resumen:
 
