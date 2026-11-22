@@ -4,14 +4,13 @@ import com.cafeteria.servicio.CafeteriaService;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
@@ -23,20 +22,39 @@ import javax.swing.SwingUtilities;
  */
 class PanelNotificaciones extends JPanel {
 
-    private final SesionGui sesion;
-    private final JTextArea texto = new JTextArea(6, 60);
-    private final JPanel receptores = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+    private SesionGui sesion;
+    private final JTextArea texto = new JTextArea(4, 60);
+    private final JPanel receptores = Estilo.transparente(new FlowLayout(FlowLayout.RIGHT, 10, 0));
     private final Map<String, JCheckBox> casillas = new LinkedHashMap<>();
     private boolean actualizando;
 
-    PanelNotificaciones(SesionGui sesion) {
-        super(new BorderLayout(4, 4));
-        this.sesion = sesion;
-        setBorder(BorderFactory.createTitledBorder("Notificaciones"));
+    /**
+     * Crea el panel vacío. Hay que llamar a {@link #conectar(SesionGui)} cuando la sesión exista:
+     * el panel se crea primero porque la fachada necesita su método {@code agregar} para enviarle avisos.
+     */
+    PanelNotificaciones() {
+        super(new BorderLayout());
+        setOpaque(false);
+
         texto.setEditable(false);
         texto.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        add(receptores, BorderLayout.NORTH);
-        add(new JScrollPane(texto), BorderLayout.CENTER);
+        texto.setForeground(Estilo.TEXTO);
+        texto.setBackground(Estilo.TARJETA);
+        texto.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+
+        JPanel encabezado = Estilo.transparente(new BorderLayout());
+        encabezado.add(Estilo.titulo("Notificaciones"), BorderLayout.WEST);
+        encabezado.add(receptores, BorderLayout.EAST);
+
+        JPanel tarjeta = Estilo.tarjeta();
+        tarjeta.add(encabezado, BorderLayout.NORTH);
+        tarjeta.add(Estilo.desplazable(texto), BorderLayout.CENTER);
+        add(tarjeta, BorderLayout.CENTER);
+    }
+
+    /** Une el panel con la sesión para mostrar y activar los receptores de notificaciones. */
+    void conectar(SesionGui sesion) {
+        this.sesion = sesion;
         sesion.alCambiar(this::refrescarReceptores);
         refrescarReceptores();
     }
@@ -55,11 +73,12 @@ class PanelNotificaciones extends JPanel {
         List<String> inactivos = servicio.receptoresInactivos();
         actualizando = true;
         if (casillas.isEmpty()) {
-            receptores.add(new javax.swing.JLabel("Receptores:"));
-            List<String> todos = new java.util.ArrayList<>(activos);
+            receptores.add(Estilo.suave("Receptores:"));
+            List<String> todos = new ArrayList<>(activos);
             todos.addAll(inactivos);
             for (String nombre : todos) {
                 JCheckBox casilla = new JCheckBox(nombre);
+                casilla.setOpaque(false);
                 casilla.addActionListener(e -> alternar(nombre, casilla));
                 casillas.put(nombre, casilla);
                 receptores.add(casilla);
