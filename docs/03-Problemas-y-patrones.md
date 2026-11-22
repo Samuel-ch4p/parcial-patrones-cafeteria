@@ -1,6 +1,6 @@
-# 11/11 Problemas de diseño y patrones de diseño seleccionados
+# Problemas de diseño y patrones de diseño elegidos
 
-## 3. Problemas de diseño identificados
+## 1. Problemas de diseño identificados
 
 Durante el análisis del sistema se identificaron cinco situaciones que podrían generar problemas de mantenimiento y escalabilidad si se implementan utilizando soluciones demasiado rígidas. Cada una representa una necesidad del proyecto en la que es importante organizar correctamente el código para facilitar la incorporación de nuevas funcionalidades.
 
@@ -164,9 +164,9 @@ La clase `Pedido` queda directamente relacionada con todos los receptores de not
 Esto genera un alto acoplamiento y dificulta realizar pruebas independientes, ya que el pedido necesita conocer los componentes encargados de recibir los avisos.
 
 ---
-## 4. Patrones de diseño elegidos
+## 2. Patrones de diseño elegidos
 
-Para solucionar los problemas identificados se seleccionaron cinco patrones de diseño. Cada uno responde a una necesidad específica del sistema y permite mejorar su organización, mantenimiento y capacidad de ampliación.
+Para solucionar los cinco problemas identificados se seleccionaron cinco patrones de diseño. Cada uno responde a una necesidad específica del sistema y permite mejorar su organización, mantenimiento y capacidad de ampliación. Al implementar el sistema se reutilizó Strategy en los métodos de pago y en los formatos de ticket, y se agregó Facade para la arquitectura, como se resume en la sección 3 y se detalla en el documento de diseño.
 
 ### Patrón 1. Factory Method (creacional) → Problema 1
 
@@ -178,7 +178,7 @@ Centraliza la creación de los productos y evita que las demás partes del siste
 
 Se eligió porque cada categoría de producto tiene características y necesidades diferentes durante su creación. Con este patrón, cada fábrica se encarga de construir los productos correspondientes a su categoría.
 
-Por ejemplo, `BebidaFactory` puede encargarse de crear cafés, tés y bebidas frías, mientras que `AlimentoFactory` puede crear sándwiches, panes y postres.
+Por ejemplo, `FabricaCafes` crea `Espresso`, `Capuchino` y `Latte`, mientras que `FabricaPanaderia`, `FabricaPostres` y `FabricaSandwiches` crean los alimentos de su categoría.
 
 De esta manera, agregar una nueva categoría no obliga a modificar las fábricas existentes.
 
@@ -193,14 +193,15 @@ También se evaluó Abstract Factory, pero no se consideró necesario porque el 
 - **Ventaja:** Permite agregar nuevos productos sin modificar las clases encargadas de crear los existentes y mantiene separada la lógica de creación.
 - **Desventaja:** Aumenta la cantidad de clases y agrega cierta complejidad para un catálogo pequeño.
 
-**Clases tentativas:**
+**Clases en el proyecto:**
 
 | Rol | Clase |
 |---|---|
-| Product | Producto |
-| ConcreteProduct | Bebida, Alimento y sus variantes |
-| Creator | ProductoFactory |
-| ConcreteCreator | BebidaFactory, AlimentoFactory |
+| Product | `Producto` |
+| ConcreteProduct | `Bebida`, `Alimento` y sus variantes (`Espresso`, `Latte`, `Croissant`, `SandwichPollo`, etc.) |
+| Creator | `FabricaProducto` |
+| ConcreteCreator | `FabricaCafes`, `FabricaTes`, `FabricaInfusiones`, `FabricaBebidasFrias`, `FabricaPanaderia`, `FabricaPostres`, `FabricaSandwiches` |
+| Client | `CatalogoProductos` |
 
 ### Patrón 2. Decorator (estructural) → Problema 2
 
@@ -225,14 +226,14 @@ También se evaluó utilizar variables booleanas dentro de la clase `Bebida`, pe
 - **Ventaja:** Permite combinar diferentes extras y agregar nuevas personalizaciones sin modificar las clases originales de las bebidas.
 - **Desventaja:** Se generan varios objetos pequeños que se envuelven entre sí, por lo que puede ser más difícil seguir la construcción de una bebida con muchas personalizaciones.
 
-**Clases tentativas:**
+**Clases en el proyecto:**
 
 | Rol | Clase |
 |---|---|
-| Component | Bebida (interfaz) |
-| ConcreteComponent | Cafe, Te, BebidaFria |
-| Decorator | ExtraDecorator |
-| ConcreteDecorator | ShotEspresso, Crema, Jarabe, Canela, LecheDeAlmendra |
+| Component | `Producto` |
+| ConcreteComponent | `Bebida` y sus variantes (`Espresso`, `Capuchino`, `Latte`, etc.) |
+| Decorator | `DecoradorBebida` |
+| ConcreteDecorator | `TamanoPequeno`, `TamanoMediano`, `TamanoGrande`, `LecheEntera`, `LecheDeslactosada`, `LecheAlmendras`, `LecheAvena`, `ShotEspresso`, `Crema`, `Jarabe`, `Canela` |
 
 ### Patrón 3. Strategy (comportamiento) → Problema 3
 
@@ -257,15 +258,15 @@ También se evaluó utilizar Decorator para acumular descuentos, pero se descart
 - **Ventaja:** Las reglas de descuento quedan separadas, facilitando su mantenimiento, ampliación y prueba individual.
 - **Desventaja:** Se necesita una clase por cada política y el sistema debe seleccionar la estrategia correspondiente para cada pedido.
 
-**Clases tentativas:**
+**Clases en el proyecto:**
 
 | Rol | Clase |
 |---|---|
-| Strategy | PoliticaDescuento (interfaz) |
-| ConcreteStrategy | SinDescuento, DescuentoClienteFrecuente, DescuentoCombo, DescuentoCodigoPromocional |
-| Context | Pedido |
+| Strategy | `PoliticaDescuento` |
+| ConcreteStrategy | `SinDescuento`, `DescuentoClienteFrecuente`, `DescuentoCombo`, `DescuentoCodigoPromocional` |
+| Context | `Pedido` |
 
-**Nota:** El mismo patrón también puede utilizarse para los métodos de pago (F5) y los formatos de ticket (F8). Sin embargo, se considera una reutilización de Strategy y no una aplicación adicional dentro de la selección principal.
+**Nota:** El mismo patrón se reutilizó para los métodos de pago (F5) con `MetodoPago`, `PagoEfectivo`, `PagoTarjeta` y `PagoBilletera`, y para los formatos de ticket (F8) con `FormatoTicket`, `TicketTextoPlano` y `TicketResumido`. Son aplicaciones de Strategy sobre áreas de variación distintas, y se explican en el documento de diseño.
 
 ### Patrón 4. State (comportamiento) → Problema 4
 
@@ -290,13 +291,13 @@ Con State es posible controlar tanto las transiciones como las acciones que se p
 - **Ventaja:** Las reglas de cada estado quedan organizadas de forma independiente y se reduce el uso de condicionales dentro de `Pedido`.
 - **Desventaja:** Se necesitan varias clases para representar los estados, lo que aumenta la cantidad de código y distribuye la lógica entre diferentes archivos.
 
-**Clases tentativas:**
+**Clases en el proyecto:**
 
 | Rol | Clase |
 |---|---|
-| Context | Pedido |
-| State | EstadoPedido (interfaz) |
-| ConcreteState | Recibido, EnPreparacion, Listo, Entregado, Cancelado |
+| Context | `Pedido` |
+| State | `EstadoPedido` |
+| ConcreteState | `Recibido`, `EnPreparacion`, `Listo`, `Entregado`, `Cancelado` |
 
 ### Patrón 5. Observer (comportamiento) → Problema 5
 
@@ -323,17 +324,17 @@ También se evaluó utilizar un bus de eventos centralizado, pero se descartó p
 - **Ventaja:** Reduce el acoplamiento entre los componentes y permite agregar o quitar observadores durante la ejecución.
 - **Desventaja:** El orden de las notificaciones no está garantizado y es necesario controlar los posibles errores de los receptores para evitar que afecten a los demás.
 
-**Clases tentativas:**
+**Clases en el proyecto:**
 
 | Rol | Clase |
 |---|---|
-| Subject | Pedido |
-| Observer | ObservadorPedido (interfaz) |
-| ConcreteObserver | PantallaCocina, NotificacionCliente, RegistroActividad |
+| Subject | `Notificador` (el `Pedido` publica un `CambioEstado` y el notificador lo entrega) |
+| Observer | `ReceptorEstado` |
+| ConcreteObserver | `PantallaCocina`, `NotificacionCliente`, `RegistroActividad` |
 
 ---
 
-## 3. Resumen de los patrones seleccionados
+## 3. Resumen de los patrones aplicados
 
 | N.º | Problema | Patrón | Categoría | Área de variación |
 |---|---|---|---|---|
@@ -342,19 +343,15 @@ También se evaluó utilizar un bus de eventos centralizado, pero se descartó p
 | 3 | Aplicación de descuentos | Strategy | Comportamiento | Descuentos (F4) |
 | 4 | Control de estados del pedido | State | Comportamiento | Ciclo de vida (F6) |
 | 5 | Notificaciones de cambios | Observer | Comportamiento | Notificaciones (F7) |
+| 6 | Métodos de pago con validaciones propias | Strategy | Comportamiento | Pagos (F5) |
+| 7 | Formatos de ticket | Strategy | Comportamiento | Tickets (F8) |
+| 8 | Acceso común desde consola y GUI | Facade | Estructural | Arquitectura (RNF-02) |
 
-## 4. Aspectos pendientes por confirmar
+## 4. Alcance final y supuestos
 
-Para definir el alcance final del análisis, se tuvieron en cuenta los siguientes supuestos:
-
-- Los métodos de pago (F5) y los formatos de ticket (F8) quedan fuera de la selección principal, ya que también podrían implementarse mediante Strategy.
+- Los métodos de pago (F5) y los formatos de ticket (F8), que en la primera selección quedaron aparte, se implementaron con Strategy. La fachada `CafeteriaService` se agregó como Facade para que la consola y la interfaz gráfica usen el mismo núcleo.
 - Se cubren tres categorías de patrones: creacionales, estructurales y de comportamiento, superando el mínimo solicitado de dos.
-- Se asume que los descuentos no se acumulan entre sí y que cada pedido utiliza una sola política.
-
-**Por validar con la docente:**
-
-- Si es suficiente trabajar con las cinco áreas seleccionadas o si también se deben incluir los pagos y los formatos de ticket.
-- Si se mantiene el alcance de las seis u ocho áreas de variación planteadas inicialmente o si se puede trabajar con una selección reducida.
+- Los descuentos no se acumulan entre sí: cada pedido utiliza una sola política.
 
 ## 5. Conclusión
 
