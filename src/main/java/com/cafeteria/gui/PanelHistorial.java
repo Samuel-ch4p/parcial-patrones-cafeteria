@@ -7,13 +7,10 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
@@ -41,24 +38,30 @@ class PanelHistorial extends JPanel {
     private List<Pedido> mostrados = new ArrayList<>();
 
     PanelHistorial(SesionGui sesion, Runnable irAPedido) {
-        super(new BorderLayout(6, 6));
+        super(new BorderLayout());
         this.sesion = sesion;
         this.irAPedido = irAPedido;
-        setBorder(BorderFactory.createTitledBorder("Historial de pedidos"));
+        setOpaque(false);
+
         filtro.addItem(TODOS);
         for (TipoEstado estado : TipoEstado.values()) {
             filtro.addItem(estado);
         }
         filtro.addActionListener(e -> refrescar());
+        Estilo.tabla(tabla, 4);
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        JPanel arriba = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        arriba.add(new JLabel("Filtrar por estado:"));
-        arriba.add(filtro);
-        JPanel abajo = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton ticket = new JButton("Ver ticket");
+        JPanel arriba = Estilo.transparente(new BorderLayout());
+        arriba.add(Estilo.titulo("Historial de pedidos"), BorderLayout.WEST);
+        JPanel filtroConEtiqueta = Estilo.transparente(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        filtroConEtiqueta.add(Estilo.suave("Filtrar por estado"));
+        filtroConEtiqueta.add(filtro);
+        arriba.add(filtroConEtiqueta, BorderLayout.EAST);
+
+        JPanel abajo = Estilo.transparente(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JButton ticket = Estilo.boton("Ver ticket", Estilo.Tipo.SECUNDARIO);
         ticket.addActionListener(e -> conSeleccion(p -> DialogoTicket.mostrar(this, sesion.servicio(), p.id())));
-        JButton trabajar = new JButton("Trabajar con este pedido");
+        JButton trabajar = Estilo.boton("Trabajar con este pedido", Estilo.Tipo.PRIMARIO);
         trabajar.addActionListener(e -> conSeleccion(p -> {
             sesion.seleccionar(p.id());
             irAPedido.run();
@@ -66,9 +69,12 @@ class PanelHistorial extends JPanel {
         abajo.add(ticket);
         abajo.add(trabajar);
 
-        add(arriba, BorderLayout.NORTH);
-        add(new JScrollPane(tabla), BorderLayout.CENTER);
-        add(abajo, BorderLayout.SOUTH);
+        JPanel tarjeta = Estilo.tarjeta();
+        tarjeta.add(arriba, BorderLayout.NORTH);
+        tarjeta.add(Estilo.desplazable(tabla), BorderLayout.CENTER);
+        tarjeta.add(abajo, BorderLayout.SOUTH);
+        add(tarjeta, BorderLayout.CENTER);
+
         sesion.alCambiar(this::refrescar);
         refrescar();
     }

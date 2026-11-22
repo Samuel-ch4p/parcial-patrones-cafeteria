@@ -3,15 +3,15 @@ package com.cafeteria.gui;
 import com.cafeteria.modelo.CafeteriaException;
 import com.cafeteria.servicio.CafeteriaService;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 /**
@@ -30,6 +30,8 @@ final class DialogoTicket {
         JTextArea texto = new JTextArea(14, 48);
         texto.setEditable(false);
         texto.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        texto.setBackground(new Color(0xFAF9F7));
+        texto.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
         Runnable actualizar = () -> {
             try {
                 texto.setText(servicio.generarTicket(pedidoId, (String) selector.getSelectedItem()));
@@ -41,12 +43,12 @@ final class DialogoTicket {
         selector.addActionListener(e -> actualizar.run());
         actualizar.run();
 
-        JPanel arriba = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        arriba.add(new JLabel("Formato:"));
+        JPanel arriba = Estilo.transparente(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        arriba.add(Estilo.suave("Formato"));
         arriba.add(selector);
-        JPanel contenido = new JPanel(new BorderLayout(4, 4));
+        JPanel contenido = new JPanel(new BorderLayout(0, 8));
         contenido.add(arriba, BorderLayout.NORTH);
-        contenido.add(new JScrollPane(texto), BorderLayout.CENTER);
+        contenido.add(Estilo.desplazable(texto), BorderLayout.CENTER);
         JOptionPane.showMessageDialog(padre, contenido, "Ticket del pedido #" + pedidoId, JOptionPane.PLAIN_MESSAGE);
     }
 }
