@@ -6,6 +6,7 @@ import com.cafeteria.servicio.CafeteriaService;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntConsumer;
 import javax.swing.JOptionPane;
 
 /**
@@ -28,12 +29,15 @@ class SesionGui {
         return servicio;
     }
 
+    /** Registra algo que debe ejecutarse cada vez que cambia el pedido (por ejemplo, refrescar un panel). */
     void alCambiar(Runnable oyente) {
         oyentes.add(oyente);
     }
 
     void notificarCambio() {
-        oyentes.forEach(Runnable::run);
+        for (Runnable oyente : oyentes) {
+            oyente.run();
+        }
     }
 
     /** Pedido en curso, o {@code null} si todavía no se ha creado ninguno. */
@@ -64,5 +68,19 @@ class SesionGui {
             JOptionPane.showMessageDialog(padre, e.getMessage(), "No se pudo completar", JOptionPane.WARNING_MESSAGE);
         }
         notificarCambio();
+    }
+
+    /**
+     * Ejecuta una acción sobre el pedido en curso, pasándole su número.
+     * Si todavía no hay pedido, avisa al usuario en lugar de fallar.
+     */
+    void conPedido(Component padre, IntConsumer accion) {
+        Pedido pedido = pedidoActual();
+        if (pedido == null) {
+            JOptionPane.showMessageDialog(padre, "Primero cree un pedido o agregue un producto.",
+                    "Sin pedido", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        ejecutar(padre, () -> accion.accept(pedido.id()));
     }
 }
