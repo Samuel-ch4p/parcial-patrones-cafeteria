@@ -59,7 +59,8 @@ class PanelCarrito extends JPanel {
         JPanel tarjeta = Estilo.tarjeta();
         tarjeta.add(armarParteSuperior(), BorderLayout.NORTH);
         JComponent listado = Estilo.desplazable(tabla);
-        listado.setPreferredSize(new Dimension(400, 150)); // altura mínima para que se vea la lista
+        listado.setPreferredSize(new Dimension(400, 170));
+        listado.setMinimumSize(new Dimension(400, 120)); // altura mínima para que se vea la lista
         tarjeta.add(listado, BorderLayout.CENTER);
         tarjeta.add(armarParteInferior(), BorderLayout.SOUTH);
         add(tarjeta, BorderLayout.CENTER);

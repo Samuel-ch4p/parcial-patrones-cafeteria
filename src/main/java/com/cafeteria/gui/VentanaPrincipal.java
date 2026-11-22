@@ -9,6 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Font;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -56,8 +57,10 @@ public class VentanaPrincipal extends JFrame {
         contenido.add(notificaciones, BorderLayout.SOUTH);
         setContentPane(contenido);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        // Alta para que quepa la lista del pedido, pero sin pasarse del tamaño de la pantalla.
+        int altoPantalla = Toolkit.getDefaultToolkit().getScreenSize().height;
         setMinimumSize(new Dimension(1000, 640));
-        setPreferredSize(new Dimension(1240, 800));
+        setPreferredSize(new Dimension(1240, Math.min(920, altoPantalla - 60)));
         pack();
         setLocationRelativeTo(null);
     }

@@ -23,7 +23,7 @@ import javax.swing.SwingUtilities;
 class PanelNotificaciones extends JPanel {
 
     private SesionGui sesion;
-    private final JTextArea texto = new JTextArea(4, 60);
+    private final JTextArea texto = new JTextArea(3, 60);
     private final JPanel receptores = Estilo.transparente(new FlowLayout(FlowLayout.RIGHT, 10, 0));
     private final Map<String, JCheckBox> casillas = new LinkedHashMap<>();
     private boolean actualizando;
