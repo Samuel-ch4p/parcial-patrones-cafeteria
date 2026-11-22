@@ -6,7 +6,7 @@ Parcial de Patrones de Diseño (Ingeniería de Software). Aplicación en Java pa
 - **Integrantes:** Samuel Chaparro, Cristian Daniel Blanco, Juan Diego Afanador
 - **Entrega:** 23 de noviembre de 2026
 
-> **Nota de integridad académica:** este proyecto se desarrolló con apoyo de Claude (IA) para generar código, pruebas y borradores de documentación. El grupo revisó, probó y adaptó el resultado y asume la responsabilidad de su contenido. El detalle está en [docs/05-documento-de-diseno.md](docs/05-documento-de-diseno.md).
+> **Nota de integridad académica:** este proyecto se desarrolló con apoyo de Claude (IA) para generar código, pruebas y borradores de documentación. El grupo revisó, probó y adaptó el resultado y asume la responsabilidad de su contenido. El detalle está en [docs/07-Documento-de-diseno.md](docs/07-Documento-de-diseno.md).
 
 ## Qué hace
 
@@ -83,7 +83,7 @@ Main
 | `servicio` | `CafeteriaService` (fachada) |
 | `consola`, `gui` | Presentación. Solo llaman a `CafeteriaService` |
 
-El núcleo (todo menos `consola` y `gui`) no importa `javax.swing` ni nada de las interfaces. Más detalle en [docs/03-arquitectura.md](docs/03-arquitectura.md).
+El núcleo (todo menos `consola` y `gui`) no importa `javax.swing` ni nada de las interfaces. Más detalle en [docs/05-Arquitectura.md](docs/05-Arquitectura.md).
 
 ## Patrones aplicados (RNF-09)
 
@@ -103,7 +103,7 @@ Tres categorías: creacional (Factory Method), estructural (Decorator, Facade) y
 ## Documentación
 
 1. [Alcance y requisitos](docs/01-alcance-y-requisitos.md)
-2. [Problemas de diseño y patrones](docs/02-problemas-y-patrones.md)
-3. [Arquitectura](docs/03-arquitectura.md)
-4. [Diagramas UML](docs/04-uml.md) (Mermaid)
-5. [Documento de diseño](docs/05-documento-de-diseno.md)
+2. [Problemas de diseño y patrones](docs/03-Problemas-y-patrones.md)
+3. [Arquitectura](docs/05-Arquitectura.md)
+4. [Diagramas UML](docs/06-Uml.md) (Mermaid)
+5. [Documento de diseño](docs/07-Documento-de-diseno.md)
