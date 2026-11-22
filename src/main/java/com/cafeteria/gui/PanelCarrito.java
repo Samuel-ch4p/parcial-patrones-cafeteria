@@ -3,44 +3,41 @@ package com.cafeteria.gui;
 import com.cafeteria.modelo.Moneda;
 import com.cafeteria.pedido.LineaPedido;
 import com.cafeteria.pedido.Pedido;
-import com.cafeteria.servicio.CafeteriaService;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * Pedido en curso: cliente, carrito, descuento, pago, estado y ticket.
- * Cada botón llama a una operación de la fachada; los cálculos los hace el núcleo.
+ * Pedido en curso: cliente, lista de ítems y totales. Debajo reúne los paneles de
+ * descuento, pago y estado, cada uno en su propia clase.
  *
  * @author Samuel Chaparro, Cristian Daniel Blanco, Juan Diego Afanador
  */
 class PanelCarrito extends JPanel {
 
-    private static final String[] DESCUENTOS = {
-        "Sin descuento", "Cliente frecuente 10%", "Combo 15%", "Código promocional"
-    };
-    private static final String[] METODOS = {"Efectivo", "Tarjeta", "Billetera digital"};
-    private static final String[] ETIQUETAS_PAGO = {"Monto recibido:", "N.º tarjeta:", "Identificador:"};
+    private static final String SIN_PEDIDO = "Sin pedido. Cree uno o agregue un producto.";
 
     private final SesionGui sesion;
     private final JTextField cliente = new JTextField(12);
-    private final JCheckBox frecuente = new JCheckBox("Frecuente");
-    private final JLabel encabezado = new JLabel("Sin pedido. Cree uno o agregue un producto.");
+    private final JCheckBox frecuente = new JCheckBox("Cliente frecuente");
+    private final JLabel encabezado = new JLabel(SIN_PEDIDO);
     private final DefaultTableModel modelo = new DefaultTableModel(
             new Object[] {"#", "Producto", "Cant.", "Precio c/u", "Subtotal"}, 0) {
         @Override
@@ -52,112 +49,114 @@ class PanelCarrito extends JPanel {
     private final JLabel subtotal = new JLabel("Subtotal: $0");
     private final JLabel descuento = new JLabel("Descuento: $0");
     private final JLabel total = new JLabel("TOTAL: $0");
-    private final JComboBox<String> tipoDescuento = new JComboBox<>(DESCUENTOS);
-    private final JTextField codigoPromo = new JTextField(8);
-    private final JComboBox<String> metodoPago = new JComboBox<>(METODOS);
-    private final JLabel etiquetaPago = new JLabel(ETIQUETAS_PAGO[0]);
-    private final JTextField datoPago = new JTextField(10);
-    private final JLabel estado = new JLabel("Estado: -");
 
     PanelCarrito(SesionGui sesion) {
-        super(new BorderLayout(6, 6));
+        super(new BorderLayout());
         this.sesion = sesion;
-        setBorder(BorderFactory.createTitledBorder("2. Pedido en curso"));
-        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        total.setFont(total.getFont().deriveFont(Font.BOLD, 16f));
+        setOpaque(false);
+        darEstilo();
 
-        JPanel norte = new JPanel(new GridLayout(0, 1));
-        JPanel nuevo = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        nuevo.add(new JLabel("Cliente:"));
-        nuevo.add(cliente);
-        nuevo.add(frecuente);
-        JButton botonNuevo = new JButton("Nuevo pedido");
-        botonNuevo.addActionListener(e -> nuevoPedido());
-        nuevo.add(botonNuevo);
-        norte.add(nuevo);
-        norte.add(encabezado);
-        add(norte, BorderLayout.NORTH);
-        add(new JScrollPane(tabla), BorderLayout.CENTER);
-        add(armarControles(), BorderLayout.SOUTH);
+        JPanel tarjeta = Estilo.tarjeta();
+        tarjeta.add(armarParteSuperior(), BorderLayout.NORTH);
+        JComponent listado = Estilo.desplazable(tabla);
+        listado.setPreferredSize(new Dimension(400, 150)); // altura mínima para que se vea la lista
+        tarjeta.add(listado, BorderLayout.CENTER);
+        tarjeta.add(armarParteInferior(), BorderLayout.SOUTH);
+        add(tarjeta, BorderLayout.CENTER);
 
-        metodoPago.addActionListener(e -> etiquetaPago.setText(ETIQUETAS_PAGO[metodoPago.getSelectedIndex()]));
         sesion.alCambiar(this::refrescar);
         refrescar();
     }
 
-    private JPanel armarControles() {
-        JPanel items = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton quitar = new JButton("Quitar ítem");
-        quitar.addActionListener(e -> quitarItem());
-        JButton cantidad = new JButton("Cambiar cantidad");
-        cantidad.addActionListener(e -> cambiarCantidad());
-        items.add(quitar);
-        items.add(cantidad);
-
-        JPanel totales = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 2));
-        totales.add(subtotal);
-        totales.add(descuento);
-        totales.add(total);
-
-        JPanel descuentos = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        descuentos.add(new JLabel("Descuento:"));
-        descuentos.add(tipoDescuento);
-        descuentos.add(new JLabel("Código:"));
-        descuentos.add(codigoPromo);
-        JButton aplicar = new JButton("Aplicar");
-        aplicar.addActionListener(e -> aplicarDescuento());
-        descuentos.add(aplicar);
-
-        JPanel pago = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        pago.add(new JLabel("Pago:"));
-        pago.add(metodoPago);
-        pago.add(etiquetaPago);
-        pago.add(datoPago);
-        JButton pagar = new JButton("Pagar");
-        pagar.addActionListener(e -> pagar());
-        pago.add(pagar);
-
-        JPanel ciclo = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        ciclo.add(estado);
-        JButton avanzar = new JButton("Avanzar estado");
-        avanzar.addActionListener(e -> conPedido(id -> sesion.servicio().avanzarEstado(id)));
-        JButton cancelar = new JButton("Cancelar pedido");
-        cancelar.addActionListener(e -> cancelarPedido());
-        JButton ticket = new JButton("Ver ticket");
-        ticket.addActionListener(e -> {
-            Pedido pedido = sesion.pedidoActual();
-            if (pedido != null) {
-                DialogoTicket.mostrar(this, sesion.servicio(), pedido.id());
-            }
-        });
-        ciclo.add(avanzar);
-        ciclo.add(cancelar);
-        ciclo.add(ticket);
-
-        JPanel sur = new JPanel(new GridLayout(0, 1));
-        sur.add(items);
-        sur.add(totales);
-        sur.add(descuentos);
-        sur.add(pago);
-        sur.add(ciclo);
-        return sur;
+    /** Colores, fuentes y anchos de las piezas de este panel. */
+    private void darEstilo() {
+        Estilo.tabla(tabla, 3, 4);
+        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabla.getColumnModel().getColumn(0).setMaxWidth(40);
+        tabla.getColumnModel().getColumn(2).setMaxWidth(60);
+        Estilo.campo(cliente);
+        frecuente.setOpaque(false);
+        encabezado.setFont(Estilo.fuente(Font.BOLD, 13f));
+        encabezado.setForeground(Estilo.TEXTO_SUAVE);
+        subtotal.setForeground(Estilo.TEXTO_SUAVE);
+        descuento.setForeground(Estilo.TEXTO_SUAVE);
+        total.setFont(Estilo.fuente(Font.BOLD, 26f));
+        total.setForeground(Estilo.ACENTO);
     }
 
+    /** Título, datos del cliente y el botón para crear un pedido nuevo. */
+    private JPanel armarParteSuperior() {
+        JButton botonNuevo = Estilo.boton("Nuevo pedido", Estilo.Tipo.SECUNDARIO);
+        botonNuevo.addActionListener(e -> nuevoPedido());
+        JPanel fila = Estilo.transparente(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        fila.add(cliente);
+        fila.add(frecuente);
+        fila.add(botonNuevo);
+
+        JPanel superior = Estilo.transparente(null);
+        superior.setLayout(new BoxLayout(superior, BoxLayout.Y_AXIS));
+        agregarFila(superior, Estilo.titulo("Tu pedido"));
+        agregarFila(superior, Estilo.conEtiqueta("Cliente (opcional)", fila));
+        agregarFila(superior, encabezado);
+        return superior;
+    }
+
+    /** Botones de ítems, totales y las filas de descuento, pago y estado. */
+    private JPanel armarParteInferior() {
+        JPanel inferior = Estilo.transparente(null);
+        inferior.setLayout(new BoxLayout(inferior, BoxLayout.Y_AXIS));
+        agregarFila(inferior, armarItemsYTotales());
+        agregarFila(inferior, Estilo.conEtiqueta("Descuento", new PanelDescuento(sesion)));
+        agregarFila(inferior, Estilo.conEtiqueta("Pago", new PanelPago(sesion)));
+        agregarFila(inferior, Estilo.conEtiqueta("Estado del pedido", new PanelEstadoPedido(sesion)));
+        return inferior;
+    }
+
+    private JPanel armarItemsYTotales() {
+        JButton quitar = Estilo.boton("Quitar ítem", Estilo.Tipo.SECUNDARIO);
+        quitar.addActionListener(e -> quitarItem());
+        JButton cambiar = Estilo.boton("Cambiar cantidad", Estilo.Tipo.SECUNDARIO);
+        cambiar.addActionListener(e -> cambiarCantidad());
+        JPanel botones = Estilo.transparente(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        botones.add(quitar);
+        botones.add(cambiar);
+
+        JPanel totales = Estilo.transparente(new GridLayout(0, 1, 0, 2));
+        for (JLabel etiqueta : new JLabel[] {subtotal, descuento, total}) {
+            etiqueta.setHorizontalAlignment(SwingConstants.RIGHT);
+            totales.add(etiqueta);
+        }
+
+        JPanel fila = Estilo.transparente(new BorderLayout(10, 0));
+        fila.add(botones, BorderLayout.WEST);
+        fila.add(totales, BorderLayout.EAST);
+        return fila;
+    }
+
+    /** Agrega una fila al bloque inferior, con un poco de aire arriba. */
+    private static void agregarFila(JPanel contenedor, JComponent fila) {
+        fila.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
+        fila.setAlignmentX(LEFT_ALIGNMENT);
+        fila.setMaximumSize(new Dimension(Integer.MAX_VALUE, fila.getPreferredSize().height));
+        contenedor.add(fila);
+    }
+
+    /** Vuelve a mostrar el pedido en curso: la tabla, el encabezado y los totales. */
     private void refrescar() {
         modelo.setRowCount(0);
         Pedido pedido = sesion.pedidoActual();
         if (pedido == null) {
-            encabezado.setText("Sin pedido. Cree uno o agregue un producto.");
+            encabezado.setText(SIN_PEDIDO);
             subtotal.setText("Subtotal: $0");
             descuento.setText("Descuento: $0");
             total.setText("TOTAL: $0");
-            estado.setText("Estado: -");
             return;
         }
         int numero = 1;
-        for (LineaPedido l : pedido.lineas()) {
-            modelo.addRow(new Object[] {numero++, l.producto().descripcion(), l.cantidad(),
-                Moneda.formatear(l.producto().precio()), Moneda.formatear(l.subtotal())});
+        for (LineaPedido linea : pedido.lineas()) {
+            modelo.addRow(new Object[] {numero, linea.producto().descripcion(), linea.cantidad(),
+                Moneda.formatear(linea.producto().precio()), Moneda.formatear(linea.subtotal())});
+            numero++;
         }
         encabezado.setText("Pedido #" + pedido.id() + " — " + pedido.cliente().nombreVisible()
                 + " — " + (pedido.estaPagado() ? "Pagado" : "Sin pagar"));
@@ -165,22 +164,6 @@ class PanelCarrito extends JPanel {
         descuento.setText("Descuento: " + Moneda.formatear(pedido.descuento())
                 + " (" + pedido.politicaDescuento().nombre() + ")");
         total.setText("TOTAL: " + Moneda.formatear(pedido.total()));
-        estado.setText("Estado: " + pedido.tipoEstado());
-    }
-
-    private interface AccionSobrePedido {
-        void ejecutar(int pedidoId);
-    }
-
-    /** Ejecuta la acción sobre el pedido en curso, o avisa si todavía no hay uno. */
-    private void conPedido(AccionSobrePedido accion) {
-        Pedido pedido = sesion.pedidoActual();
-        if (pedido == null) {
-            JOptionPane.showMessageDialog(this, "Primero cree un pedido o agregue un producto.",
-                    "Sin pedido", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        sesion.ejecutar(this, () -> accion.ejecutar(pedido.id()));
     }
 
     private void nuevoPedido() {
@@ -199,7 +182,7 @@ class PanelCarrito extends JPanel {
                     JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        conPedido(id -> sesion.servicio().quitarItem(id, fila));
+        sesion.conPedido(this, id -> sesion.servicio().quitarItem(id, fila));
     }
 
     private void cambiarCantidad() {
@@ -213,53 +196,8 @@ class PanelCarrito extends JPanel {
         int respuesta = JOptionPane.showConfirmDialog(this, selector, "Nueva cantidad",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (respuesta == JOptionPane.OK_OPTION) {
-            conPedido(id -> sesion.servicio().cambiarCantidad(id, fila, (Integer) selector.getValue()));
-        }
-    }
-
-    private void aplicarDescuento() {
-        CafeteriaService servicio = sesion.servicio();
-        switch (tipoDescuento.getSelectedIndex()) {
-            case 0 -> conPedido(servicio::quitarDescuento);
-            case 1 -> conPedido(servicio::aplicarDescuentoClienteFrecuente);
-            case 2 -> conPedido(servicio::aplicarDescuentoCombo);
-            default -> conPedido(id -> servicio.aplicarCodigoPromocional(id, codigoPromo.getText()));
-        }
-    }
-
-    private void pagar() {
-        CafeteriaService servicio = sesion.servicio();
-        conPedido(id -> {
-            String dato = datoPago.getText();
-            var resultado = switch (metodoPago.getSelectedIndex()) {
-                case 0 -> servicio.pagarEfectivo(id, montoDe(dato));
-                case 1 -> servicio.pagarTarjeta(id, dato);
-                default -> servicio.pagarBilletera(id, dato);
-            };
-            datoPago.setText("");
-            JOptionPane.showMessageDialog(this, "Pago aprobado: " + resultado.detalle(), "Pago",
-                    JOptionPane.INFORMATION_MESSAGE);
-        });
-    }
-
-    /** Convierte el texto del monto; si no es un número lo trata como 0 para que el pago se rechace. */
-    private static long montoDe(String texto) {
-        try {
-            return Long.parseLong(texto.trim().replace(".", "").replace("$", ""));
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    private void cancelarPedido() {
-        Pedido pedido = sesion.pedidoActual();
-        if (pedido == null) {
-            return;
-        }
-        int respuesta = JOptionPane.showConfirmDialog(this, "¿Cancelar el pedido #" + pedido.id() + "?",
-                "Cancelar pedido", JOptionPane.YES_NO_OPTION);
-        if (respuesta == JOptionPane.YES_OPTION) {
-            conPedido(id -> sesion.servicio().cancelarPedido(id));
+            int nueva = (Integer) selector.getValue();
+            sesion.conPedido(this, id -> sesion.servicio().cambiarCantidad(id, fila, nueva));
         }
     }
 }
