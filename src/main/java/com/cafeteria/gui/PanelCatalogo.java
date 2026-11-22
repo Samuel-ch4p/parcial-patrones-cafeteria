@@ -6,17 +6,15 @@ import com.cafeteria.modelo.CafeteriaException;
 import com.cafeteria.modelo.Moneda;
 import com.cafeteria.producto.Producto;
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -48,14 +46,17 @@ class PanelCatalogo extends JPanel {
     private final List<String> codigosExtras = new ArrayList<>();
     private final JSpinner cantidad = new JSpinner(new SpinnerNumberModel(1, 1, 99, 1));
     private final JLabel vistaPrevia = new JLabel(" ");
-    private final JPanel personalizacion = new JPanel(new GridLayout(0, 1, 2, 2));
-    private final JButton agregar = new JButton("Agregar al pedido");
+    private final JPanel personalizacion = Estilo.transparente(new GridLayout(0, 1, 0, 8));
+    private final JButton agregar = Estilo.boton("Agregar al pedido", Estilo.Tipo.PRIMARIO);
 
     PanelCatalogo(SesionGui sesion) {
-        super(new BorderLayout(6, 6));
+        super(new BorderLayout());
         this.sesion = sesion;
         this.productos = sesion.servicio().catalogo();
-        setBorder(BorderFactory.createTitledBorder("1. Catálogo y personalización"));
+        setOpaque(false);
+
+        JPanel tarjeta = Estilo.tarjeta();
+        tarjeta.add(Estilo.titulo("Menú"), BorderLayout.NORTH);
 
         DefaultTableModel modelo = new DefaultTableModel(new Object[] {"Producto", "Categoría", "Precio base"}, 0) {
             @Override
@@ -67,6 +68,7 @@ class PanelCatalogo extends JPanel {
             modelo.addRow(new Object[] {p.nombre(), p.categoria().etiqueta(), Moneda.formatear(p.precioBase())});
         }
         tabla = new JTable(modelo);
+        Estilo.tabla(tabla, 2);
         tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tabla.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -75,20 +77,27 @@ class PanelCatalogo extends JPanel {
         });
 
         armarPersonalizacion();
-        JPanel abajo = new JPanel(new BorderLayout(4, 4));
-        abajo.add(detalle, BorderLayout.NORTH);
-        abajo.add(personalizacion, BorderLayout.CENTER);
-        JPanel pie = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        pie.add(new JLabel("Cantidad:"));
-        pie.add(cantidad);
-        pie.add(agregar);
-        JPanel sur = new JPanel(new GridLayout(0, 1));
-        sur.add(vistaPrevia);
-        sur.add(pie);
-        abajo.add(sur, BorderLayout.SOUTH);
+        detalle.setFont(Estilo.fuente(Font.PLAIN, 13f));
+        detalle.setForeground(Estilo.TEXTO);
+        vistaPrevia.setFont(Estilo.fuente(Font.BOLD, 13f));
+        vistaPrevia.setForeground(Estilo.ACENTO);
 
-        add(new JScrollPane(tabla), BorderLayout.CENTER);
-        add(abajo, BorderLayout.SOUTH);
+        JPanel pie = Estilo.transparente(new BorderLayout(10, 0));
+        JPanel cantidadConEtiqueta = Estilo.conEtiqueta("Cantidad", cantidad);
+        pie.add(cantidadConEtiqueta, BorderLayout.WEST);
+        pie.add(agregar, BorderLayout.EAST);
+
+        JPanel abajo = Estilo.transparente(new BorderLayout(0, 10));
+        JPanel informacion = Estilo.transparente(new GridLayout(0, 1, 0, 4));
+        informacion.add(detalle);
+        informacion.add(vistaPrevia);
+        abajo.add(informacion, BorderLayout.NORTH);
+        abajo.add(personalizacion, BorderLayout.CENTER);
+        abajo.add(pie, BorderLayout.SOUTH);
+
+        tarjeta.add(Estilo.desplazable(tabla), BorderLayout.CENTER);
+        tarjeta.add(abajo, BorderLayout.SOUTH);
+        add(tarjeta, BorderLayout.CENTER);
 
         agregar.addActionListener(e -> agregarAlPedido());
         agregar.setEnabled(false);
@@ -106,22 +115,21 @@ class PanelCatalogo extends JPanel {
         for (OpcionPersonalizacion o : sesion.servicio().opciones(TipoOpcion.LECHE)) {
             leche.addItem(new Item(o.codigo(), o.nombre() + " (+" + Moneda.formatear(o.recargo()) + ")"));
         }
-        JPanel filaTamano = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        filaTamano.add(new JLabel("Tamaño:"));
-        filaTamano.add(tamano);
-        filaTamano.add(new JLabel("Leche:"));
-        filaTamano.add(leche);
-        JPanel filaExtras = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        filaExtras.add(new JLabel("Extras:"));
+        JPanel filaCombos = Estilo.transparente(new GridLayout(1, 2, 10, 0));
+        filaCombos.add(Estilo.conEtiqueta("Tamaño", tamano));
+        filaCombos.add(Estilo.conEtiqueta("Leche", leche));
+
+        JPanel casillas = Estilo.transparente(new GridLayout(0, 2, 10, 2));
         for (OpcionPersonalizacion o : sesion.servicio().opciones(TipoOpcion.EXTRA)) {
             JCheckBox casilla = new JCheckBox(o.nombre() + " (+" + Moneda.formatear(o.recargo()) + ")");
+            casilla.setOpaque(false);
             casilla.addActionListener(e -> actualizarVistaPrevia());
             extras.add(casilla);
             codigosExtras.add(o.codigo());
-            filaExtras.add(casilla);
+            casillas.add(casilla);
         }
-        personalizacion.add(filaTamano);
-        personalizacion.add(filaExtras);
+        personalizacion.add(filaCombos);
+        personalizacion.add(Estilo.conEtiqueta("Extras", casillas));
     }
 
     private Producto seleccionado() {
@@ -136,7 +144,7 @@ class PanelCatalogo extends JPanel {
             detalle.setText(" ");
             return;
         }
-        detalle.setText("<html><b>" + p.nombre() + "</b>: " + p.detalle() + "</html>");
+        detalle.setText("<html><body style='width:330px'><b>" + p.nombre() + "</b>: " + p.detalle() + "</body></html>");
         setPersonalizable(p.categoria().esBebida());
         actualizarVistaPrevia();
     }
@@ -174,7 +182,8 @@ class PanelCatalogo extends JPanel {
         }
         try {
             Producto resultado = sesion.servicio().previsualizar(p.codigo(), codigo(tamano), codigo(leche), extrasElegidos());
-            vistaPrevia.setText("Quedará: " + resultado.descripcion() + " — " + Moneda.formatear(resultado.precio()) + " c/u");
+            vistaPrevia.setText("<html><body style='width:330px'>Quedará: " + resultado.descripcion()
+                    + " — " + Moneda.formatear(resultado.precio()) + " c/u</body></html>");
         } catch (CafeteriaException e) {
             vistaPrevia.setText(e.getMessage());
         }
