@@ -9,6 +9,7 @@ import com.cafeteria.descuento.DescuentoClienteFrecuente;
 import com.cafeteria.descuento.DescuentoCodigoPromocional;
 import com.cafeteria.descuento.DescuentoCombo;
 import com.cafeteria.descuento.DescuentoInvalidoException;
+import com.cafeteria.descuento.SinDescuento;
 import com.cafeteria.extras.Canela;
 import com.cafeteria.extras.TamanoGrande;
 import com.cafeteria.modelo.Cliente;
@@ -108,6 +109,22 @@ class PedidoTest {
     void comboQueNoAplicaSeRechazaYConservaLaPolitica() {
         pedido.agregar(new Latte(), 1);
         assertThrows(DescuentoInvalidoException.class, () -> pedido.aplicarDescuento(new DescuentoCombo()));
+        assertEquals("Sin descuento", pedido.politicaDescuento().nombre());
+    }
+
+    @Test
+    void noSeAplicaDescuentoAUnPedidoVacio() {
+        assertThrows(DescuentoInvalidoException.class,
+                () -> pedido.aplicarDescuento(new DescuentoCodigoPromocional("CAFE10")));
+        assertEquals("Sin descuento", pedido.politicaDescuento().nombre());
+    }
+
+    @Test
+    void sePuedeQuitarElDescuentoAunqueElPedidoQuedeVacio() {
+        pedido.agregar(new Latte(), 1);
+        pedido.aplicarDescuento(new DescuentoClienteFrecuente());
+        pedido.quitar(0);
+        pedido.aplicarDescuento(new SinDescuento());
         assertEquals("Sin descuento", pedido.politicaDescuento().nombre());
     }
 

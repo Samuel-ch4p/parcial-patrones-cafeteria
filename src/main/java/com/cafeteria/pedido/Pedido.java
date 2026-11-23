@@ -1,6 +1,7 @@
 package com.cafeteria.pedido;
 
 import com.cafeteria.descuento.ContextoDescuento;
+import com.cafeteria.descuento.DescuentoInvalidoException;
 import com.cafeteria.descuento.PoliticaDescuento;
 import com.cafeteria.descuento.SinDescuento;
 import com.cafeteria.modelo.Cliente;
@@ -108,6 +109,9 @@ public class Pedido {
     /** Cambia la política de descuento; falla si el pedido no cumple su condición. */
     public void aplicarDescuento(PoliticaDescuento politica) {
         exigirModificable();
+        if (lineas.isEmpty() && !(politica instanceof SinDescuento)) {
+            throw new DescuentoInvalidoException("Agregue productos al pedido antes de aplicar un descuento.");
+        }
         politica.validar(contextoDescuento());
         this.politicaDescuento = politica;
     }
