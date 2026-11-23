@@ -90,4 +90,16 @@ class DecoradorBebidaTest {
         Producto bebida = new Personalizador(opciones).personalizar(new Latte(), null, null, List.of("vainilla"));
         assertEquals(9200, bebida.precio());
     }
+
+    @Test
+    void unaOpcionConCodigoEnMayusculasSeEncuentra() {
+        CatalogoOpciones opciones = new CatalogoOpciones();
+        opciones.registrar(" Vainilla ", "Vainilla", TipoOpcion.EXTRA, Canela::new);
+        assertEquals("vainilla", opciones.buscar(TipoOpcion.EXTRA, "Vainilla").codigo());
+        assertEquals("vainilla", opciones.buscar(TipoOpcion.EXTRA, "vainilla").codigo());
+        assertThrows(PersonalizacionInvalidaException.class,
+                () -> opciones.registrar("CANELA", "Otra canela", TipoOpcion.EXTRA, Canela::new));
+        assertThrows(PersonalizacionInvalidaException.class,
+                () -> opciones.registrar("  ", "Sin código", TipoOpcion.EXTRA, Canela::new));
+    }
 }

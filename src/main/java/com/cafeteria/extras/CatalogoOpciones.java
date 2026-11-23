@@ -44,11 +44,15 @@ public class CatalogoOpciones {
 
     /** Registra una opción nueva; el recargo se calcula a partir del propio decorador. */
     public void registrar(String codigo, String nombre, TipoOpcion tipo, UnaryOperator<Producto> aplicador) {
-        if (opciones.containsKey(codigo)) {
-            throw new PersonalizacionInvalidaException("Ya existe la opción " + codigo);
+        if (codigo == null || codigo.isBlank()) {
+            throw new PersonalizacionInvalidaException("La opción necesita un código.");
+        }
+        String clave = codigo.trim().toLowerCase();
+        if (opciones.containsKey(clave)) {
+            throw new PersonalizacionInvalidaException("Ya existe la opción " + clave);
         }
         long recargo = aplicador.apply(SONDA).precio() - SONDA.precio();
-        opciones.put(codigo, new OpcionPersonalizacion(codigo, nombre, tipo, recargo, aplicador));
+        opciones.put(clave, new OpcionPersonalizacion(clave, nombre, tipo, recargo, aplicador));
     }
 
     public List<OpcionPersonalizacion> opciones(TipoOpcion tipo) {

@@ -82,6 +82,28 @@ class FabricaProductoTest {
     }
 
     @Test
+    void unProductoConCodigoEnMayusculasSeEncuentra() {
+        class Mocaccino extends Bebida {
+            Mocaccino() {
+                super(" MOCA ", "Mocaccino", Categoria.CAFE, 8000, "Café con chocolate.");
+            }
+        }
+        catalogo.registrar(() -> List.of(new Mocaccino()));
+        assertEquals(8000, catalogo.buscar("moca").precio());
+        assertEquals(8000, catalogo.buscar("MOCA").precio());
+    }
+
+    @Test
+    void rechazaCodigosRepetidosAunqueCambienMayusculas() {
+        class EspressoDoble extends Bebida {
+            EspressoDoble() {
+                super("ESPRESSO", "Espresso doble", Categoria.CAFE, 6000, "");
+            }
+        }
+        assertThrows(CafeteriaException.class, () -> catalogo.registrar(() -> List.of(new EspressoDoble())));
+    }
+
+    @Test
     void unAlimentoNoPuedeTenerCategoriaDeBebida() {
         assertThrows(CafeteriaException.class, () -> new Alimento("x", "X", Categoria.CAFE, 1000, "") { });
     }

@@ -21,10 +21,11 @@ public class CatalogoProductos {
     /** Registra todos los productos que produce la fábrica. Rechaza códigos repetidos. */
     public void registrar(FabricaProducto fabrica) {
         for (Producto producto : fabrica.crearProductos()) {
-            if (productos.containsKey(producto.codigo())) {
+            String clave = producto.codigo().trim().toLowerCase();
+            if (productos.containsKey(clave)) {
                 throw new CafeteriaException("Ya existe un producto con el código " + producto.codigo());
             }
-            productos.put(producto.codigo(), producto);
+            productos.put(clave, producto);
         }
     }
 
