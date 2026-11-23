@@ -16,7 +16,9 @@ import com.cafeteria.modelo.Cliente;
 import com.cafeteria.notificacion.Notificador;
 import com.cafeteria.pago.PagoEfectivo;
 import com.cafeteria.pago.PagoInvalidoException;
+import com.cafeteria.producto.Bebida;
 import com.cafeteria.producto.BrownieChocolate;
+import com.cafeteria.producto.Categoria;
 import com.cafeteria.producto.Latte;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,6 +68,31 @@ class PedidoTest {
         assertEquals(60, pedido.lineas().get(0).cantidad());
         pedido.agregar(new Latte(), 39);
         assertEquals(99, pedido.lineas().get(0).cantidad());
+    }
+
+    @Test
+    void unItemNoPuedeSuperarElValorMaximo() {
+        class CafeDeLujo extends Bebida {
+            CafeDeLujo() {
+                super("lujo", "Café de lujo", Categoria.CAFE, 2_000_000, "");
+            }
+        }
+        pedido.agregar(new CafeDeLujo(), 50);
+        assertEquals(100_000_000, pedido.subtotal());
+        assertThrows(PedidoException.class, () -> pedido.agregar(new CafeDeLujo(), 1));
+        assertThrows(PedidoException.class, () -> pedido.cambiarCantidad(0, 51));
+        assertEquals(100_000_000, pedido.subtotal());
+    }
+
+    @Test
+    void unPrecioGiganteNoProduceTotalesNegativos() {
+        class Imposible extends Bebida {
+            Imposible() {
+                super("imposible", "Imposible", Categoria.CAFE, Long.MAX_VALUE / 50, "");
+            }
+        }
+        assertThrows(PedidoException.class, () -> pedido.agregar(new Imposible(), 60));
+        assertEquals(0, pedido.subtotal());
     }
 
     @Test
