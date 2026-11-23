@@ -56,6 +56,17 @@ mvn test
 
 La consola también se puede alimentar con un archivo de entradas, por ejemplo `java -jar target/sistema-cafeteria-1.0.0.jar consola < entradas.txt`. Al acabarse el archivo termina sin errores.
 
+### Desde Apache NetBeans
+
+NetBeans ya trae Maven, así que no hace falta instalarlo aparte.
+
+1. **File → Open Project…** y elegir la carpeta del proyecto (la que tiene `pom.xml`). La primera vez descarga las dependencias.
+2. **Probar:** clic derecho sobre el proyecto → **Test** (`Alt + F6`). El resultado aparece en la ventana **Test Results**.
+3. **Consola:** menú **Run → Run Project** (o clic derecho sobre el proyecto → **Run**). Si pide la clase principal, elegir `com.cafeteria.Main`. La consola se usa desde la ventana **Output** (`Ctrl + 4` si está cerrada).
+4. **Interfaz gráfica:** clic derecho sobre la raíz del proyecto → **Properties → Run**. Poner `com.cafeteria.Main` en **Main Class** y `gui` en **Arguments**, y aceptar. Desde ahí **Run → Run Project** abre la ventana. Para volver a la consola, dejar **Arguments** vacío.
+   - No usar *Run File* (`Shift + F6`) sobre `Main.java`: ignora los argumentos y siempre abre la consola.
+5. **Generar el `.jar`:** clic derecho → **Clean and Build** (`Shift + F11`). Queda en `target/`.
+
 ## Estructura de paquetes
 
 Base: `com.cafeteria`. Las flechas indican "depende de"; no hay ciclos.
