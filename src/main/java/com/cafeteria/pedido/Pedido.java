@@ -79,6 +79,12 @@ public class Pedido {
             LineaPedido existente = lineas.get(i);
             if (existente.producto().codigo().equals(producto.codigo())
                     && existente.producto().descripcion().equals(producto.descripcion())) {
+                int disponible = LineaPedido.MAXIMO - existente.cantidad();
+                if (cantidad > disponible) {
+                    throw new PedidoException("Ya hay " + existente.cantidad() + " de " + producto.descripcion()
+                            + " en el pedido; el máximo por ítem es " + LineaPedido.MAXIMO
+                            + " (puede agregar hasta " + disponible + ").");
+                }
                 lineas.set(i, existente.conCantidad(existente.cantidad() + cantidad));
                 return;
             }

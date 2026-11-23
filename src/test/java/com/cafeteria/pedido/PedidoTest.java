@@ -58,6 +58,17 @@ class PedidoTest {
     }
 
     @Test
+    void sumarMasDelMaximoExplicaCuantoSePuedeAgregar() {
+        pedido.agregar(new Latte(), 60);
+        PedidoException error = assertThrows(PedidoException.class, () -> pedido.agregar(new Latte(), 50));
+        assertTrue(error.getMessage().contains("Ya hay 60 de Latte"), error.getMessage());
+        assertTrue(error.getMessage().contains("puede agregar hasta 39"), error.getMessage());
+        assertEquals(60, pedido.lineas().get(0).cantidad());
+        pedido.agregar(new Latte(), 39);
+        assertEquals(99, pedido.lineas().get(0).cantidad());
+    }
+
+    @Test
     void mismoProductoConOtraPersonalizacionEsOtroItem() {
         pedido.agregar(new Latte(), 1);
         pedido.agregar(new Canela(new Latte()), 1);
