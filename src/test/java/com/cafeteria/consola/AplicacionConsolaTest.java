@@ -63,6 +63,18 @@ class AplicacionConsolaTest {
     }
 
     @Test
+    void montoInvalidoEnConsolaSeRechazaYSePuedeCorregir() {
+        String salida = ejecutar(
+                "3", "n", "",                    // pedido anónimo
+                "1", "1", "n", "1",              // espresso x1, sin personalizar
+                "5", "1", "20..000", "$100.000", // efectivo: primero mal, luego bien
+                "0", "0");
+        assertTrue(salida.contains("Monto inválido: \"20..000\""), salida);
+        assertTrue(salida.contains("Pago aprobado: Efectivo (recibido $100.000"), salida);
+        assertTrue(salida.contains("Hasta pronto."));
+    }
+
+    @Test
     void siSeAcabaLaEntradaTerminaSinExcepcion() {
         String salida = ejecutar("1");
         assertTrue(salida.contains("Fin de la entrada"));
