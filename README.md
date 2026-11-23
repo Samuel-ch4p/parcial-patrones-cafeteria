@@ -118,3 +118,4 @@ Tres categorías: creacional (Factory Method), estructural (Decorator, Facade) y
 3. [Arquitectura](docs/05-Arquitectura.md)
 4. [Diagramas UML](docs/06-Uml.md) (Mermaid)
 5. [Documento de diseño](docs/07-Documento-de-diseno.md)
+6. [Revisión de calidad](docs/08-Revision-de-calidad.md)
