@@ -211,7 +211,7 @@ Se utilizó **Claude** (asistente de IA de Anthropic) como apoyo en este proyect
 
 - generar la estructura inicial del proyecto, el código Java del núcleo, la consola y la interfaz Swing;
 - redactar las pruebas JUnit y ejecutar la compilación y las pruebas;
-- redactar borradores del README y de los documentos 02 a 05, incluidos los diagramas Mermaid;
+- redactar borradores del README y de los documentos de la carpeta `docs`, incluidos los diagramas Mermaid;
 - verificar que los diagramas coincidieran con las clases reales.
 
 La revisión de calidad posterior ([documento 08](08-Revision-de-calidad.md)) la realizó Juan Diego Afanador con apoyo de Claude, que ayudó a analizar el código, reproducir los errores y redactar las correcciones y sus pruebas. Juan Diego definió el alcance de la revisión, decidió qué corregir y qué dejar a decisión del grupo, autorizó cada cambio, ejecutó las pruebas en su equipo, revisó cada diferencia y publicó cada corrección como un commit independiente.
