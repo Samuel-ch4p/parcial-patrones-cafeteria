@@ -63,6 +63,3 @@ Dependencias reales entre paquetes:
 ## 4. Datos y extensión
 - Todo vive en memoria dentro de `CafeteriaService` (catálogo, pedidos, receptores, formatos). Al cerrar, se pierde (RNF-08).
 - Puntos de extensión de la fachada sin tocar código existente (RNF-04): `registrarFabrica(FabricaProducto)`, `registrarFormato(FormatoTicket)`, `registrarReceptor(ReceptorEstado)`; `CatalogoOpciones.registrar(...)` para extras; y clases nuevas de `PoliticaDescuento` o `MetodoPago` con su método de la fachada.
-
-- Todo vive en memoria dentro de `CafeteriaService` (catálogo, pedidos, receptores, formatos). Al cerrar, se pierde (RNF-08).
-- Puntos de extensión de la fachada sin tocar código existente (RNF-04): `registrarFabrica(FabricaProducto)`, `registrarFormato(FormatoTicket)`, `registrarReceptor(ReceptorEstado)`; `CatalogoOpciones.registrar(...)` para extras; y clases nuevas de `PoliticaDescuento` o `MetodoPago` con su método de la fachada.
