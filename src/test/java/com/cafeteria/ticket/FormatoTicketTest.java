@@ -11,6 +11,7 @@ import com.cafeteria.modelo.Cliente;
 import com.cafeteria.modelo.Moneda;
 import com.cafeteria.notificacion.Notificador;
 import com.cafeteria.pago.PagoEfectivo;
+import com.cafeteria.pago.PagoTarjeta;
 import com.cafeteria.pedido.Pedido;
 import com.cafeteria.producto.BrownieChocolate;
 import com.cafeteria.producto.Latte;
@@ -77,5 +78,30 @@ class FormatoTicketTest {
         String total = Moneda.formatear(pedido.total());
         assertTrue(new TicketTextoPlano().generar(pedido).contains(total));
         assertTrue(new TicketResumido().generar(pedido).contains(total));
+    }
+
+    @Test
+    void resumidoUsaSingularYOmiteDescuentoSiNoHay() {
+        Pedido simple = new Pedido(6, Cliente.anonimo(), new Notificador());
+        simple.agregar(new Latte(), 1);
+        String ticket = new TicketResumido().generar(simple);
+        assertTrue(ticket.contains("1 unidad |"), ticket);
+        assertFalse(ticket.contains("Descuento"), ticket);
+        assertTrue(ticket.contains("Pago: pendiente"), ticket);
+    }
+
+    @Test
+    void textoPlanoMuestraLosUltimosDigitosDeLaTarjeta() {
+        pedido.pagar(new PagoTarjeta("4111 1111 1111 1234"));
+        String ticket = new TicketTextoPlano().generar(pedido);
+        assertTrue(ticket.contains("Tarjeta terminada en 1234"), ticket);
+        assertFalse(ticket.contains("4111"), ticket);
+    }
+
+    @Test
+    void ambosFormatosMuestranElEstadoCancelado() {
+        pedido.cancelar();
+        assertTrue(new TicketTextoPlano().generar(pedido).contains("Estado:  Cancelado"));
+        assertTrue(new TicketResumido().generar(pedido).contains("| Cancelado"));
     }
 }
