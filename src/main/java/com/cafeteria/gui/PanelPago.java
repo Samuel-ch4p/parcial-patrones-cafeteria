@@ -1,5 +1,6 @@
 package com.cafeteria.gui;
 
+import com.cafeteria.modelo.Moneda;
 import com.cafeteria.pago.ResultadoPago;
 import com.cafeteria.servicio.CafeteriaService;
 import java.awt.FlowLayout;
@@ -61,12 +62,8 @@ class PanelPago extends JPanel {
         });
     }
 
-    /** Convierte el texto del monto; si no es un número lo trata como 0 para que el pago se rechace. */
+    /** Convierte el texto del monto con la misma regla que la consola; si es inválido, la sesión muestra el error. */
     private static long montoDe(String texto) {
-        try {
-            return Long.parseLong(texto.trim().replace(".", "").replace("$", ""));
-        } catch (NumberFormatException e) {
-            return 0;
-        }
+        return Moneda.parsear(texto);
     }
 }

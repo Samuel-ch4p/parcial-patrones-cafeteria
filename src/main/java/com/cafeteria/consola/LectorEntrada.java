@@ -1,5 +1,7 @@
 package com.cafeteria.consola;
 
+import com.cafeteria.modelo.CafeteriaException;
+import com.cafeteria.modelo.Moneda;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -71,18 +73,13 @@ class LectorEntrada {
         }
     }
 
-    /** Lee un monto en pesos (entero positivo, se aceptan puntos de miles). */
+    /** Lee un monto en pesos (ej. 20000, 20.000 o $20.000); repite la pregunta si es inválido. */
     long leerMonto(String pregunta) {
         while (true) {
-            String texto = leerTexto(pregunta).replace(".", "").replace("$", "");
             try {
-                long valor = Long.parseLong(texto);
-                if (valor >= 0) {
-                    return valor;
-                }
-                salida.println("  Error: el monto no puede ser negativo.");
-            } catch (NumberFormatException e) {
-                salida.println("  Error: ingrese el monto como número entero, por ejemplo 20000.");
+                return Moneda.parsear(leerTexto(pregunta));
+            } catch (CafeteriaException e) {
+                salida.println("  Error: " + e.getMessage());
             }
         }
     }
