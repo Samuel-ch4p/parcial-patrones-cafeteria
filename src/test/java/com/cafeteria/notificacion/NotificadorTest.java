@@ -103,4 +103,26 @@ class NotificadorTest {
         assertEquals(2, recibidos.size());
         assertEquals(TipoEstado.CANCELADO, recibidos.get(1).nuevo());
     }
+
+    @Test
+    void unReceptorQueFallaNoDejaSinAvisoALosDemas() {
+        notificador.quitar("registro");
+        notificador.agregar(new ReceptorEstado() {
+            @Override
+            public String nombre() {
+                return "pantalla-rota";
+            }
+
+            @Override
+            public void actualizar(CambioEstado cambio) {
+                throw new IllegalStateException("pantalla desconectada");
+            }
+        });
+        notificador.agregar(registro);
+        Pedido pedido = new Pedido(8, Cliente.anonimo(), notificador);
+        pedido.avanzar();
+        assertEquals(TipoEstado.EN_PREPARACION, pedido.tipoEstado());
+        assertEquals(2, cocina.mensajes().size());
+        assertEquals(2, registro.mensajes().size());
+    }
 }

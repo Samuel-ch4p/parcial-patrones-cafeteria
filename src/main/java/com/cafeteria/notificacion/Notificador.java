@@ -39,10 +39,17 @@ public class Notificador {
         return receptores.stream().map(ReceptorEstado::nombre).toList();
     }
 
-    /** Avisa a todos los receptores activos. */
+    /**
+     * Avisa a todos los receptores activos. Si uno falla, se informa el error
+     * y se sigue con los demás: un receptor roto no deja sin aviso al resto.
+     */
     public void notificar(CambioEstado cambio) {
         for (ReceptorEstado receptor : receptores) {
-            receptor.actualizar(cambio);
+            try {
+                receptor.actualizar(cambio);
+            } catch (RuntimeException e) {
+                System.err.println("El receptor \"" + receptor.nombre() + "\" falló: " + e.getMessage());
+            }
         }
     }
 }
