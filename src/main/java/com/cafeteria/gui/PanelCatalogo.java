@@ -160,6 +160,14 @@ class PanelCatalogo extends JPanel {
         }
     }
 
+    /** Deja tamaño, leche y extras sin elegir para que no pasen al siguiente producto. */
+    private void reiniciarPersonalizacion() {
+        tamano.setSelectedIndex(0);
+        leche.setSelectedIndex(0);
+        extras.forEach(c -> c.setSelected(false));
+        actualizarVistaPrevia();
+    }
+
     private List<String> extrasElegidos() {
         List<String> elegidos = new ArrayList<>();
         for (int i = 0; i < extras.size(); i++) {
@@ -199,6 +207,7 @@ class PanelCatalogo extends JPanel {
             sesion.servicio().agregarItem(pedidoId, p.codigo(), (Integer) cantidad.getValue(),
                     codigo(tamano), codigo(leche), extrasElegidos());
             cantidad.setValue(1);
+            reiniciarPersonalizacion();
         });
     }
 }
